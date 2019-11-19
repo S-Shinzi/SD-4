@@ -1,46 +1,11 @@
 # mysqlclient-1.4.5
 
 
-# 振替輸送情報の変換
-def Transfer_conv(Transfer):
-    if Transfer == ('JR', 10):
-        return ((1,18),(0,0),(0,0))
-    elif Transfer[0] == 'JR' or 'Sotetu' or 'Toei':
-        return ((1,47),(1,16),(1,7))
-    elif Transfer[0] == 'ToykoMetoro':
-        return ((1,7),(0,0),(0,0))
-    elif Transfer[0] == 'Tokyu':
-        if Transfer[1] == 1:
-            return ((1,32),(1,13),(1,6))
-        elif Transfer[1] == 2:
-            return ((1,28),(1,2),(1,6))
-    elif Transfer[0] == ('keio', 1):
-        return ((1,27),(0,0),(1,7))
-    elif Transfer[0] == 'YokohamaSubway':
-        return ((0,0),(5,13),(0,0))
-    elif Transfer[0] == 'TamaMonorail':
-        return ((18,27),(0,0),(1,7))
-
-# 判定用関数
-def judge(Set_Sta, Pass_Route, Transfer_section, Transfer, cursor):
-
-    import Transfer_section
-    import MySQLdb
+# 路線判定（支障区間と定期区間の判定） 
+def judge_1(Pass_Route, rows):
 
     # 路線判定（支障区間と定期区間の判定）
     Route_judge = False
-
-    # 設置駅判定（当社振替輸送対応区間と設置駅の判定）
-    Sta_judge = False
-
-    # 振替輸送情報
-    ts = Transfer_conv(Transfer)
-
-    # sqlの実行
-    cursor.execute("SELECT route.Route_Abbr,Sta_number FROM `composite` JOIN route on route.id=composite.Route_id JOIN station on station.Sta_id=composite.Sta_id WHERE Route_id=1")
-
-    # 結果の取得
-    rows = cursor.fetchall()
 
     # 支障区間と定期区間の判定
     for passR in Pass_Route:
@@ -50,20 +15,88 @@ def judge(Set_Sta, Pass_Route, Transfer_section, Transfer, cursor):
                 break
         if Route_judge:
             break
+    
+    return Route_judge
 
-    # 振替輸送対応区間と設置駅の判定
+# 振替輸送対応区間と設置駅の判定
+def judge_2(Transfer, Set_Sta):
+    import Transfer_section
+
+    # 設置駅判定
+    Sta_judge = False
+
+    ts = Transfer_section.Transfer_conv(Transfer)
+
     Transfer_section = Transfer_section.Transfer_segment(*ts)
     for trans_Section in Transfer_section:
         if Set_Sta == trans_Section:
             Sta_judge = True
             break
 
-    return bool(Sta_judge and Route_judge)
+    return Sta_judge
 
+# create sql
+def CreateSQL(Transfer):
+
+    sql = "SELECT route.Route_Abbr,Sta_number FROM `composite` JOIN route on route.id=composite.Route_id JOIN station on station.Sta_id=composite.Sta_id WHERE "
+
+    JR = {1:1, 2:2, 3:(2,3), 4:4, 5:5, 6:6, 7:7, 8:8, 9:9, 10:10}
+    Toei = {1:11, 2:11, 3:11, 4:12, 5:12, 6:13, 7:14}
+    TokyoMetro = {1:15, 2:(16,17), 5:18, 9:19, 20:(15,16,17,18,19,20,21,22,23,24)}
+    Tokyu = {1:(25,26,27,28,29,30),2:31}
+    Keio = {1:(37,32)}
+    Sotetu = {1:33}
+    YokohamaSubway = {1:(34,35)}
+    TamaMonorail = {1:36}
+
+    if (type(eval(Transfer[0])[Transfer[1]]) is str):
+        sql += 'Route_id='+str((eval(Transfer[0])[Transfer[1]]))
+    else:
+        tmp = eval(Transfer[0])[Transfer[1]]
+        isFirst = True
+        for i in tmp:
+            if isFirst:
+                sql += 'Route_id='+str(i)
+                isFirst = False
+                continue
+            sql += ' or Route_id='+str(i)
+
+
+    sql += ';'
+
+    return sql
+
+
+
+
+# DBに接続し、sqlを実行、結果をreturnする
+def SQL(sql):
+    import MySQLdb
+
+    # MySQLへ接続
+    connection = MySQLdb.connect(
+        host = 'localhost',
+        user = 'root',
+        passwd = '',
+        db = 'station_judge',
+        charset = 'utf8'
+        )
+
+    cursor = connection.cursor()
+
+    # sqlの実行
+    cursor.execute("SELECT route.Route_Abbr,Sta_number FROM `composite` JOIN route on route.id=composite.Route_id JOIN station on station.Sta_id=composite.Sta_id WHERE Route_id=1")
+
+    # 結果の取得
+    rows = cursor.fetchall()
+
+    # 接続を閉じる
+    connection.close()
+
+    return rows
 
 
 def main():
-    import MySQLdb
     import Transfer_section
 
     # 設置駅
@@ -77,30 +110,12 @@ def main():
 
     # 最終判定
     Transport_judge = False
-
-
-
-    # MySQLへ接続
-    connection = MySQLdb.connect(
-        host = 'localhost',
-        user = 'root',
-        passwd = '',
-        db = 'station_judge',
-        charset = 'utf8'
-        )
-
-    cursor = connection.cursor()
-
-    Transport_judge = judge(Set_Sta, Pass_Route, Transfer_section, Transfer, cursor)
     
     if Transport_judge:
         print ("通過可")
     else:
         print("通過不可")
 
-
-    # 接続を閉じる
-    connection.close()
 
 if __name__ == "__main__":
     main()
