@@ -1,4 +1,7 @@
-# 振替輸送に対応する当社振替輸送区間
+# 振替情報を与えるとそれに対応した小田急の振替対応範囲の駅一覧をリストで出力する
+
+
+# 振替輸送に対応する当社振替輸送区間を小田原線、江ノ島線、多摩線ごとに駅ナンバーで出力
 def Transfer_conv(Transfer):
     if Transfer == ('JR', 10):
         return ((1,18),(0,0),(0,0))
@@ -18,7 +21,7 @@ def Transfer_conv(Transfer):
     elif Transfer[0] == 'TamaMonorail':
         return ((18,27),(0,0),(1,7))
 
-
+# (小田原線, 江ノ島線, 多摩線)となっている駅ナンバーからすべての駅を１つのリストにして出力
 def Transfer_segment(oh, oe ,ot):
     count = 1
     dict = []
@@ -38,18 +41,19 @@ def Transfer_segment(oh, oe ,ot):
             Sta_count = ot[1]
             route_name = 'OT'
         
-
         while (count <= Sta_count):
+            if count == 0:
+                break
             dict.append((route_name, count))
             count += 1
     return dict
 
 
-def main():
-    transfer = ('JR', 1)
+def main(Railway, Nomber):
+    transfer = (Railway, Nomber)
     tmp = Transfer_conv(transfer)
     print(Transfer_segment(*tmp))
 
 
 if __name__ == "__main__":
-    main()
+    main('JR', 10)

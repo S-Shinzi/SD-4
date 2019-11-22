@@ -2,7 +2,7 @@
 
 
 # 路線判定（支障区間と定期区間の判定） 
-def judge_1(Pass_Route, rows):
+def RouteJudge(Pass_Route, rows):
 
     # 路線判定（支障区間と定期区間の判定）
     Route_judge = False
@@ -18,8 +18,8 @@ def judge_1(Pass_Route, rows):
     
     return Route_judge
 
-# 振替輸送対応区間と設置駅の判定
-def judge_2(Transfer, Set_Sta):
+# 駅判定（振替輸送対応区間と設置駅の判定）
+def StationJudge(Transfer, Set_Sta):
     import Transfer_section
 
     # 設置駅判定
@@ -35,7 +35,7 @@ def judge_2(Transfer, Set_Sta):
 
     return Sta_judge
 
-# create sql
+# 入力された振替情報から振替区間に相当する駅のSELECT文を作成
 def CreateSQL(Transfer):
 
     sql = "SELECT route.Route_Abbr,Sta_number FROM `composite` JOIN route on route.id=composite.Route_id JOIN station on station.Sta_id=composite.Sta_id WHERE "
@@ -49,7 +49,9 @@ def CreateSQL(Transfer):
     YokohamaSubway = {1:(34,35)}
     TamaMonorail = {1:36}
 
-    if (type(eval(Transfer[0])[Transfer[1]]) is str):
+    tmp = eval(Transfer[0])[Transfer[1]]
+
+    if (type(tmp) is int):
         sql += 'Route_id='+str((eval(Transfer[0])[Transfer[1]]))
     else:
         tmp = eval(Transfer[0])[Transfer[1]]
@@ -70,7 +72,7 @@ def CreateSQL(Transfer):
 
 
 # DBに接続し、sqlを実行、結果をreturnする
-def SQL(sql):
+def GetTable(sql):
     import MySQLdb
 
     # MySQLへ接続
@@ -85,7 +87,7 @@ def SQL(sql):
     cursor = connection.cursor()
 
     # sqlの実行
-    cursor.execute("SELECT route.Route_Abbr,Sta_number FROM `composite` JOIN route on route.id=composite.Route_id JOIN station on station.Sta_id=composite.Sta_id WHERE Route_id=1")
+    cursor.execute(sql)
 
     # 結果の取得
     rows = cursor.fetchall()
@@ -94,6 +96,16 @@ def SQL(sql):
     connection.close()
 
     return rows
+
+# 最終判定
+def Transport_judge(Route_judge, Sta_judge):
+
+    Transport_judge = False
+    
+    if Transport_judge:
+        print ("通過可")
+    else:
+        print("通過不可")
 
 
 def main():
@@ -108,14 +120,17 @@ def main():
     # 定期券経路
     Pass_Route = (('JY', 4), ('JY', 17), ('OH', 28), ('OE', 13))
 
-    # 最終判定
-    Transport_judge = False
-    
-    if Transport_judge:
-        print ("通過可")
-    else:
-        print("通過不可")
+
+    sql = CreateSQL(Transfer)
+
+    rows = GetTable(sql)
+
+    StationJudge(Transfer, Set_Sta)
+
+    RouteJudge(Pass_Route, rows)
+
 
 
 if __name__ == "__main__":
-    main()
+    Transfer = ('JR', 3)
+    CreateSQL(Transfer)
