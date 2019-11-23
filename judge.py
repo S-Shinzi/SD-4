@@ -1,40 +1,6 @@
 # mysqlclient-1.4.5
 
 
-# 路線判定（支障区間と定期区間の判定） 
-def RouteJudge(Pass_Route, rows):
-
-    # 路線判定（支障区間と定期区間の判定）
-    Route_judge = False
-
-    # 支障区間と定期区間の判定
-    for passR in Pass_Route:
-        for row in rows:
-            if passR == row:
-                Route_judge = True
-                break
-        if Route_judge:
-            break
-    
-    return Route_judge
-
-# 駅判定（振替輸送対応区間と設置駅の判定）
-def StationJudge(Transfer, Set_Sta):
-    import Transfer_section
-
-    # 設置駅判定
-    Sta_judge = False
-
-    ts = Transfer_section.Transfer_conv(Transfer)
-
-    Transfer_section = Transfer_section.Transfer_segment(*ts)
-    for trans_Section in Transfer_section:
-        if Set_Sta == trans_Section:
-            Sta_judge = True
-            break
-
-    return Sta_judge
-
 # 入力された振替情報から振替区間に相当する駅のSELECT文を作成
 def CreateSQL(Transfer):
 
@@ -69,8 +35,6 @@ def CreateSQL(Transfer):
     return sql
 
 
-
-
 # DBに接続し、sqlを実行、結果をreturnする
 def GetTable(sql):
     import MySQLdb
@@ -97,25 +61,72 @@ def GetTable(sql):
 
     return rows
 
+
+# 路線判定（支障区間と定期区間の判定） 
+def RouteJudge(Pass_Route, rows):
+
+    # 路線判定（支障区間と定期区間の判定）
+    Route_judge = False
+
+    # 支障区間と定期区間の判定
+    for passR in Pass_Route:
+        for row in rows:
+            if passR == row:
+                Route_judge = True
+                break
+        if Route_judge:
+            break
+    
+    return Route_judge
+
+# 駅判定（振替輸送対応区間と設置駅の判定）
+def StationJudge(Transfer, Set_Sta):
+    import Transfer_section
+
+    # 設置駅判定
+    Sta_judge = False
+
+    ts = Transfer_section.Transfer_conv(Transfer)
+
+    Sta_list = Transfer_section.Transfer_segment(*ts)
+    for trans_Section in Sta_list:
+        if Set_Sta == trans_Section:
+            Sta_judge = True
+            break
+
+    return Sta_judge
+
+
 # 最終判定
 def Transport_judge(Route_judge, Sta_judge):
 
     Transport_judge = False
     
+    Transport_judge = Route_judge and Sta_judge
+
     if Transport_judge:
         print ("通過可")
     else:
         print("通過不可")
 
 
-def main():
-    import Transfer_section
 
+def main():
     # 設置駅
     Set_Sta = ('OE', 9) #湘南台
 
     # 実施振替輸送（ex.JR1号振替→('JR', 1)）
-    Transfer = ('JR', 1)
+    """
+    JR東日本 : 'JR'
+    都営地下鉄 : 'Toei'
+    東京メトロ : 'TokyoMetro'
+    東急電鉄 : 'Tokyu'
+    京王電鉄 : 'Keio'
+    相模鉄道 : 'Sotetu'
+    横浜市営地下鉄 : 'YokohamaSubway'
+    多摩都市モノレール : 'TamaMonorail'
+    """
+    Transfer = ('YokohamaSubway', 1)
 
     # 定期券経路
     Pass_Route = (('JY', 4), ('JY', 17), ('OH', 28), ('OE', 13))
@@ -125,12 +136,12 @@ def main():
 
     rows = GetTable(sql)
 
-    StationJudge(Transfer, Set_Sta)
+    Route_judge = RouteJudge(Pass_Route, rows)
 
-    RouteJudge(Pass_Route, rows)
+    Sta_judge = StationJudge(Transfer, Set_Sta)
 
+    Transport_judge(Route_judge, Sta_judge)
 
 
 if __name__ == "__main__":
-    Transfer = ('JR', 3)
-    CreateSQL(Transfer)
+    main()
