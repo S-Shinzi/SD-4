@@ -8,7 +8,7 @@ import time
 #import iogging ログ
 # 処理前の時刻
 t1 = time.time() 
-image_file = '1-12.png'
+image_file = "smkt.png"
 img = cv2.imread(image_file)
 
 # detect pink 
