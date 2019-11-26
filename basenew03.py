@@ -15,25 +15,33 @@ root = tk.Tk()
 root.title("定期")
 root['background'] ='gray'
 root.geometry("1000x600+0+20")
+lmain = tk.Label(root)
+lmain.grid()
 
+
+
+width, height = 80, 60
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
 
 def dow():
 
 
-    canvas01b = tk.Canvas(root, width=290, height=250)
+    canvas01b = tk.Canvas(root, width=290, height=255)
     canvas01b.create_rectangle(0, 0, 949,333, fill='black')
     canvas01b.place(x=10, y=30)
-    canvas01 = tk.Canvas(root, width=280, height=240)
+    canvas01 = tk.Canvas(root, width=280, height=245)
     canvas01.create_rectangle(0, 0, 0, 0, fill='gray')
     canvas01.place(x=15, y=35)
 
-    canvas02b = tk.Canvas(root, width=302, height=250)
-    canvas02b.create_rectangle(0, 0, 949,333, fill='black')
-    canvas02b.place(x=320, y=30)
-    canvas02 = tk.Canvas(root, width=292, height=240)
-    canvas02.create_rectangle(0, 0, 0, 0, fill='gray')
-    canvas02.place(x=325, y=35)
+#    canvas02b = tk.Canvas(root, width=302, height=255)
+#    canvas02b.create_rectangle(0, 0, 949,333, fill='black')
+#    canvas02b.place(x=320, y=30)
+#    canvas02 = tk.Canvas(root, width=292, height=245)
+#    canvas02.create_rectangle(0, 0, 0, 0, fill='gray')
+#    canvas02.place(x=325, y=35)
 
     canvas03b = tk.Canvas(root, width=310, height=365)
     canvas03b.create_rectangle(0, 0, 310,365, fill='black')
@@ -350,11 +358,19 @@ for i in range(1):                              #ボタンの数は１こ
     #text_widget.pack(column=30, row=10, sticky=(tk.N, tk.S, tk.E, tk.W))
 
 
-    text_widgetD = tk.Text(root,width=42, height=18)
-    text_widgetD.place(x=324, y=34)
+    #text_widgetD = tk.Text(root,width=42, height=19)
+    #text_widgetD.place(x=324, y=34)
     #text_widget.pack(column=30, row=10, sticky=(tk.N, tk.S, tk.E, tk.W))
 
-
+    _, frame = cap.read()
+    frame = cv2.flip(frame, 1)
+    cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
+    img = Image.fromarray(cv2image)
+    imgtk = ImageTk.PhotoImage(image=img)
+    lmain.imgtk = imgtk
+    lmain.configure(image=imgtk,width=302, height=255)
+    lmain.after(10)
+    lmain.place(x=320, y=30)
 
 
     root.columnconfigure(0, weight=1)
