@@ -1,6 +1,7 @@
 # mysqlclient-1.4.5
 
 
+
 # 入力された振替情報から振替区間に相当する駅のSELECT文を作成
 def CreateSQL(Transfer):
 
