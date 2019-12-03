@@ -1,4 +1,19 @@
+<<<<<<< HEAD
 #Pasmoの画像を渡すとOCR結果を出力する
+=======
+import numpy as np
+import cv2
+from PIL import Image
+import sys
+import pyocr
+import pyocr.builders#pyocrを2列にする必要があるかはわからないが一応
+import time
+#import iogging ログ
+# 処理前の時刻
+t1 = time.time() 
+image_file = "smkt.png"
+img = cv2.imread(image_file)
+>>>>>>> fcbb5c56ed40805809e8d1efc715bceee591c920
 
 def PasumoOCR(image_file):
     import numpy as np
