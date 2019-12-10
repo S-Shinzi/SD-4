@@ -36,8 +36,10 @@ lmain.grid()
 
 
 def on_closing():
-    if messagebox.showwarning("メッセージ", "ウィンドウを閉じる際はEXITボタンを押して下さい。"):
-        print("消せません")
+    ret = messagebox.askyesno('確認', 'ウィンドウを閉じますか？')
+    if ret == True:
+        sys.exit()
+    
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
 def crozz(event):
@@ -287,19 +289,17 @@ for i in range(1):                              #ボタンの数は１こ
         # ボタン、ウィンドウの設定
     button = tk.Button(root,text="判定")#ボタンの名前はダイスロール
     button2 = tk.Button(root,text="エラーテスト")
-    button3 = tk.Button(root,text="EXIT")
 
         # ウィジェットが左クリックされたときの関数を定義
     
     button.bind("<1>",delsan)  
     button2.bind("<1>",popup)
-    button3.bind("<1>",crozz)
             
                 #ボタンが押されることによってcallbackに飛ぶ
         # ボタンとテキストの配置
     button.place(x=40,y=2)    
     button2.place(x=10, y=400)                     #ウィンドウ内ボタンの位置
-    button3.place(x=80,y=2) 
+
 
 
     combo = ttk.Combobox(root, state='readonly')
