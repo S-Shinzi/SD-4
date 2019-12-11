@@ -1,8 +1,16 @@
 # OCRから受け取ったリストを駅ナンバリングに変換
 
+class station():
+    def __init__(self):
+        self.Entry_route = []
+    
+    def set_Route(self, ocrList):
+        self.Entry_route = ocrList
+
+    def get_Route(self):
+        return self.Entry_route
 
 def CreatePassRoute(ocrList):
-
 
     import re
 
@@ -22,21 +30,18 @@ def CreatePassRoute(ocrList):
     ocrList = tmp
 
     sql = ""
-    pass_route_tmp = []
     pass_route = []
+    station[]
+    count = 0
 
     for name in ocrList:
+        station[count] = station()
         sql = CreatePassRoute(name)
-        pass_route_tmp += GetTable(sql)
+        station[count].set_Route(GetTable(sql))
+    
+    
 
-    for i in range(pass_route_tmp):
-        if i == 0:
-            continue
-        for j in pass_route_tmp[i]:
-            for k in pass_route_tmp[i+1]:
-                if j[0] == k[0] or ((j[0] == 'OH' or j[0] == 'OE' or j[0] == 'OT') == (k[0] == 'OH' or k[0] == 'OE' or k[0] == 'OT')):
-                    pass_route += j
-                    pass_route += k
+    
 
     return pass_route
 
