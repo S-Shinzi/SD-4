@@ -1,8 +1,9 @@
 # OCRから受け取ったリストを駅ナンバリングに変換
 
 class station():
-    def __init__(self):
+    def __init__(self,ocrList):
         self.Entry_route = []
+        self.set_Route(ocrList)
     
     def set_Route(self, ocrList):
         self.Entry_route = ocrList
@@ -31,29 +32,45 @@ def CreatePassRoute(ocrList):
 
     sql = ""
     pass_route = []
-    station[]
-    count = 0
+    station_list = []
 
     for name in ocrList:
-        station[count] = station()
-        sql = CreatePassRoute(name)
-        station[count].set_Route(GetTable(sql))
+        sql = CreateSQL(name)
+        rows = GetTable(sql)
+        station_list.append(station(rows))
     
+    count = 0
     
+    for i in station_list:
+        if count == 0:
+            Sta_tmp1 = i.get_Route()
+            count += 1
+            continue
+        
+        Sta_tmp = i.get_Route()
 
-    
+        for j in Sta_tmp1:
+            for k in Sta_tmp:
+                if((j[0] == k[0])or((j[0]=='OH' or j[0]=='OE' or j[0]=='OT')and(k[0]=='OH' or k[0]=='OE' or k[0]=='OT'))):
+                    pass_route.append(j)
+                    pass_route.append(k)
+                    continue
 
+        Sta_tmp1 = Sta_tmp
+        count += 1
+            
+        
     return pass_route
 
 
 
 def CreateSQL(sta_name):
 
-    sql = "SELECT route.Route_Name,route.Route_Abbr,Sta_number,station.Sta_Name FROM `composite` JOIN route on route.id=composite.Route_id JOIN station on station.Sta_id=composite.Sta_id WHERE "
+    sql = "SELECT route.Route_Abbr,Sta_number,station.Sta_Name FROM `composite` JOIN route on route.id=composite.Route_id JOIN station on station.Sta_id=composite.Sta_id WHERE "
 
-    sql += "Sta_Name="+sta_name
+    sql += "Sta_Name LIKE \"%"+sta_name
 
-    sql += ";"
+    sql += "%\";"
 
     return sql
 
@@ -86,8 +103,8 @@ def GetTable(sql):
 
 
 def main():
-    CreatePassRoute(['長後', 'あざみ野', '中央林間・田園都市線'])
-
+    pri = CreatePassRoute(['長後', 'あざみ野', '中央林間・田園都市線'])
+    print(pri)
 
 if __name__ == '__main__':
     main()
