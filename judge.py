@@ -64,7 +64,11 @@ def GetTable(sql):
 
 
 # 路線判定（支障区間と定期区間の判定） 
-def RouteJudge(Pass_Route, rows):
+def RouteJudge(Pass_Route, Transfer):
+
+    sql = CreateSQL(Transfer)
+
+    rows = GetTable(sql)
 
     # 路線判定（支障区間と定期区間の判定）
     Route_judge = False
@@ -113,6 +117,7 @@ def Transport_judge(Route_judge, Sta_judge):
 
 
 def main():
+
     # 設置駅
     Set_Sta = ('OE', 9) #湘南台
 
@@ -132,10 +137,6 @@ def main():
     # 定期券経路
     Pass_Route = (('JY', 4), ('JY', 17), ('OH', 28), ('OE', 13))
 
-
-    sql = CreateSQL(Transfer)
-
-    rows = GetTable(sql)
 
     Route_judge = RouteJudge(Pass_Route, rows)
 

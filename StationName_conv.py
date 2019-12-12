@@ -66,7 +66,7 @@ def CreatePassRoute(ocrList):
 
 def CreateSQL(sta_name):
 
-    sql = "SELECT route.Route_Abbr,Sta_number,station.Sta_Name FROM `composite` JOIN route on route.id=composite.Route_id JOIN station on station.Sta_id=composite.Sta_id WHERE "
+    sql = "SELECT route.Route_Abbr,Sta_number FROM `composite` JOIN route on route.id=composite.Route_id JOIN station on station.Sta_id=composite.Sta_id WHERE "
 
     sql += "Sta_Name LIKE \"%"+sta_name
 

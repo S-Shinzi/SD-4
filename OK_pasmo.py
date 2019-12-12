@@ -110,7 +110,10 @@ def PasumoOCR(image_file):
 
 
 def main():
-    print(PasumoOCR("/mnt/hgfs/pythonShare/PASMO_template.png"))
+    image_file = "C:/Users/user/Documents/pasmo/"
+    image_file += "OE-09_JT-08"
+    image_file += ".png"
+    print(PasumoOCR(image_file))
 
 
 
