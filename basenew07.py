@@ -35,8 +35,14 @@ def foon(event):
 
     # ルートフレームの作成
     root = tk.Tk()
+    root.geometry("700x227+0+20")
     # ツリービューの作成
     tree = ttk.Treeview(root)
+
+
+
+
+
 
     # 列インデックスの作成
     tree["columns"] = (1,2,3,4,5,6,7)
@@ -59,8 +65,6 @@ def foon(event):
     tree.heading(6,text="read_result")
     tree.heading(7,text="judge_result")
 
-    X= 10
-    print(X)
 
     # レコードの作成
     # 1番目の引数-配置場所（ツリー形式にしない表設定ではブランクとする）
@@ -69,10 +73,25 @@ def foon(event):
     # 3番目の引数-values:レコードの値をタプルで指定する
     for row in cursor:
         tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+    tree.insert("","end",values=("X",row[1],row[2],row[3],row[4],row[5],row[6]))
+
 
     # ツリービューの配置
-    tree.pack()
-
+    tree.pack(fill="both")
+    style.configure('Calendar.Treeview', rowheight=40)
+    tree = ttk.Treeview(root, style='Calendar.Treeview')
     root.mainloop()
 
 
