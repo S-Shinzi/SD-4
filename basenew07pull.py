@@ -6,7 +6,10 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter.font import Font
 import sys
+import cv2
+from PIL import Image, ImageTk
 import threading#カメラ関係、必須
+import judge_manager
 
 #！！！最初に読んで下さい！！！
 #現段階では、ウィンドウを消してもターミナルが消えず、カメラが起動したになってしまっています。
@@ -28,6 +31,8 @@ root.resizable(width=False, height=False)
 lmain = tk.Label(root)
 lmain.grid()
 
+buffer = tk.StringVar()
+buffer.set('')
 
 def on_closing():
     ret = messagebox.askyesno('確認', 'ウィンドウを閉じますか？')
@@ -43,15 +48,29 @@ def crozz(event):
 
 
 def videoLoop(mirror=False):
+    global startJudge
+    startJudge = False
     No=0
     cap = cv2.VideoCapture(No)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 10)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1)
-
+    
     while True:
         ret, frame = cap.read()
         if mirror is True:
             frame = frame[:,::-1]
+        
+        print(startJudge)
+
+        if(startJudge):
+            print('11111111111111')
+            # 画像切り抜き img[top : bottom, left : right]
+            frame = frame[116 : 360, 120 : 524]
+
+            # 切り抜いた画像を上下反転
+            frame = cv2.rotate(frame, cv2.ROTATE_180)
+
+            judge_manager.JudgeManager(frame)
 
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         image = Image.fromarray(image)
@@ -61,6 +80,13 @@ def videoLoop(mirror=False):
         panel.place(x=325, y=35)
 
     return panel
+
+def ImageCapture(event):
+    key = event.keysym
+    if(key == "space"):
+        startJudge = True
+        print(startJudge)
+    
 
 
 
@@ -170,155 +196,124 @@ def win2(event):
 
 
 for i in range(1):                              #ボタンの数は１こ
-              #winサイズと位置設定
-
-    button2 = tk.Button(root,text="エラーテスト")
-    button2.bind("<1>",popup)
-    button2.place(x=10, y=400)   
-
+    #winサイズと位置設定
 
     combo = ttk.Combobox(root, state='readonly')
     combo2 = ttk.Combobox(root, state='readonly')
+
     # リストの値を設定
     combo["values"] = ("JR1号","JR2号","JR3号","JR4号","JR5号","JR6号","JR7号","JR8号","JR9号","JR10号",
     "都営地下鉄1号","都営地下鉄2号","都営地下鉄3号","都営地下鉄4号","都営地下鉄5号","都営地下鉄6号","都営地下鉄7号",
     "東京メトロ1号","東京メトロ2号","東京メトロ5号","東京メトロ9号","東京メトロ20号",
     "東急1号","東急2号","京王1号","相鉄","横浜市営地下鉄線","多摩モノレール")
     combo2["values"] = (
-"OH01　新宿駅"
-,"OH02　南新宿駅"
-,"OH03　参宮橋駅"
-,"OH04　代々木八幡駅"
-,"OH05　代々木上原駅"
-,"OH06　東北沢駅"
-,"OH07　下北沢駅"
-,"OH08　世田谷代田駅"
-,"OH09　梅が丘駅"
-,"OH10　豪徳寺駅"
-,"OH11　経堂駅"
-,"OH12　千歳船橋駅"
-,"OH13　祖師ヶ谷大蔵駅"
-,"OH14　成城学園前駅"
-,"OH15　喜多見駅"
-,"OH16　狛江駅"
-,"OH17　和泉多摩川駅"
-,"OH18　登戸駅"
-,"OH19　向ヶ丘遊園駅"
-,"OH20　生田駅"
-,"OH21　読売ランド前駅"
-,"OH22　百合ヶ丘駅"
-,"OH23　新百合ヶ丘駅"
-,"OH24　柿生駅"
-,"OH25　鶴川駅"
-,"OH26　玉川学園前"
-,"OH27　町田駅"
-,"OH28　相模大野駅"
-,"OH29　小田急相模原駅"
-,"OH30　相武台前駅"
-,"OH31　座間駅"
-,"OH32　海老名駅"
-,"OH33　厚木駅"
-,"OH34　本厚木駅"
-,"OH35　愛甲石田駅"
-,"OH36　伊勢原駅"
-,"OH37　鶴巻温泉駅"
-,"OH38　東海大学前駅"
-,"OH39　秦野駅"
-,"OH40　渋沢駅"
-,"OH41　新松田駅"
-,"OH42　開成駅"
-,"OH43　栢山駅"
-,"OH44　富水駅"
-,"OH45　螢田駅"
-,"OH46　足柄駅"
-,"OH47　小田原駅"
-,"OH48　箱根板橋駅"
-,"OH49　風祭駅"
-,"OH50　入生田駅"
-,"OH51　箱根湯本駅"
+    "OH01　新宿駅"
+    ,"OH02　南新宿駅"
+    ,"OH03　参宮橋駅"
+    ,"OH04　代々木八幡駅"
+    ,"OH05　代々木上原駅"
+    ,"OH06　東北沢駅"
+    ,"OH07　下北沢駅"
+    ,"OH08　世田谷代田駅"
+    ,"OH09　梅が丘駅"
+    ,"OH10　豪徳寺駅"
+    ,"OH11　経堂駅"
+    ,"OH12　千歳船橋駅"
+    ,"OH13　祖師ヶ谷大蔵駅"
+    ,"OH14　成城学園前駅"
+    ,"OH15　喜多見駅"
+    ,"OH16　狛江駅"
+    ,"OH17　和泉多摩川駅"
+    ,"OH18　登戸駅"
+    ,"OH19　向ヶ丘遊園駅"
+    ,"OH20　生田駅"
+    ,"OH21　読売ランド前駅"
+    ,"OH22　百合ヶ丘駅"
+    ,"OH23　新百合ヶ丘駅"
+    ,"OH24　柿生駅"
+    ,"OH25　鶴川駅"
+    ,"OH26　玉川学園前"
+    ,"OH27　町田駅"
+    ,"OH28　相模大野駅"
+    ,"OH29　小田急相模原駅"
+    ,"OH30　相武台前駅"
+    ,"OH31　座間駅"
+    ,"OH32　海老名駅"
+    ,"OH33　厚木駅"
+    ,"OH34　本厚木駅"
+    ,"OH35　愛甲石田駅"
+    ,"OH36　伊勢原駅"
+    ,"OH37　鶴巻温泉駅"
+    ,"OH38　東海大学前駅"
+    ,"OH39　秦野駅"
+    ,"OH40　渋沢駅"
+    ,"OH41　新松田駅"
+    ,"OH42　開成駅"
+    ,"OH43　栢山駅"
+    ,"OH44　富水駅"
+    ,"OH45　螢田駅"
+    ,"OH46　足柄駅"
+    ,"OH47　小田原駅"
+    ,"OH48　箱根板橋駅"
+    ,"OH49　風祭駅"
+    ,"OH50　入生田駅"
+    ,"OH51　箱根湯本駅"
 
-,"OE01　東林間駅"
-,"OE02　中央林間駅"
-,"OE03　南林間駅"
-,"OE04　鶴間駅"
-,"OE05　大和駅"
-,"OE06　桜ヶ丘駅"
-,"OE07　高座渋谷駅"
-,"OE08　長後駅"
-,"OE09　湘南台駅"
-,"OE10　六会日大前駅"
-,"OE11　善行駅"
-,"OE12　藤沢本町駅"
-,"OE13　藤沢駅"
-,"OE14　本鵠沼駅"
-,"OE15　鵠沼海岸駅"
-,"OE16　片瀬江ノ島駅"
+    ,"OE01　東林間駅"
+    ,"OE02　中央林間駅"
+    ,"OE03　南林間駅"
+    ,"OE04　鶴間駅"
+    ,"OE05　大和駅"
+    ,"OE06　桜ヶ丘駅"
+    ,"OE07　高座渋谷駅"
+    ,"OE08　長後駅"
+    ,"OE09　湘南台駅"
+    ,"OE10　六会日大前駅"
+    ,"OE11　善行駅"
+    ,"OE12　藤沢本町駅"
+    ,"OE13　藤沢駅"
+    ,"OE14　本鵠沼駅"
+    ,"OE15　鵠沼海岸駅"
+    ,"OE16　片瀬江ノ島駅"
 
-,"OT01　五月台駅"
-,"OT02　栗平駅"
-,"OT03　黒川駅"
-,"OT04　はるひ野駅"
-,"OT05　小田急永山駅"
-,"OT06　小田急多摩センター駅"
-,"OT07　唐木田駅"
-
-,"C01　代々木上原駅"
-,"C02　代々木公園駅"
-,"C03　明治神宮前（原宿）駅"
-,"C04　表参道駅"
-,"C05　乃木坂駅"
-,"C06　赤坂駅"
-,"C07　国会議事堂前駅"
-,"C08　霞が関駅"
-,"C09　日比谷駅"
-,"C10　二重橋前（丸の内）駅"
-,"C11　大手町駅"
-,"C12　新御茶ノ水駅"
-,"C13　湯島駅"
-,"C14　根津駅"
-,"C15　千駄木駅"
-,"C16　西日暮里駅"
-,"C17　町屋駅"
-,"C18　北千住駅"
-,"C19　綾瀬駅"
-,"C20　北綾瀬駅"
-,"JL19　綾瀬駅"
-,"JL20　亀有駅"
-,"JL21　金町駅"
-,"JL22　松戸駅"
-,"JL23　北松戸駅"
-,"JL24　馬橋駅"
-,"JL25　新松戸駅"
-,"JL26　北小金駅"
-,"JL27　南柏駅"
-,"JL28　柏駅"
-,"JL29　北柏駅"
-,"JL30　我孫子駅"
-,"JL31　天皇台駅"
-,"JL32　取手駅"
+    ,"OT01　五月台駅"
+    ,"OT02　栗平駅"
+    ,"OT03　黒川駅"
+    ,"OT04　はるひ野駅"
+    ,"OT05　小田急永山駅"
+    ,"OT06　小田急多摩センター駅"
+    ,"OT07　唐木田駅"
 
 
 )
 #pack
     combo.grid(column=50, row=0 )
     combo2.grid(column=50, row=1)
-        # デフォルトの値を食費(index=0)に設定
+        # デフォルトの値を初期値(index=0)に設定
     combo.current(0)
     combo2.current(0)
     # コンボボックスの配置
     combo.grid()
     combo.place(x=700, y=120)
+    combo = ttk.Combobox(root, state='readonly')
     combo2.grid()
     combo2.place(x=700, y=240)
+    combo2 = ttk.Combobox(root, state='readonly')
     # ボタンの作成（コールバックコマンドには、コンボボックスの値を取得しprintする処理を定義）
+    #button1 = tk.Button(root,text="判定")
+    #button1.bind("<1>",judge)
+    button2 = tk.Button(root,text="エラーテスト")
+    button2.bind("<1>",popup)
     button3 = tk.Button(text="ターミナルに表示",command=lambda:print(combo.get()+"\n",combo2.get()))#\nで改行,それぞれのcomboの値を表示
     button4 = tk.Button(root,text="ウィンドウ生成")
     button4.bind("<1>",win2) 
     # ボタンの配置
+    button2.place(x=10, y=400)   
     button3.grid(column=50, row=20)
     button3.place(x=700, y=300)
     button4.grid(column=50, row=20)
     button4.place(x=820, y=300)
+
 
 
 #width=935, height=150)
@@ -386,7 +381,11 @@ for i in range(1):                              #ボタンの数は１こ
     txt3['yscrollcommand'] = scrollbar.set
     scrollbar.grid(row=1,column=1,sticky=(N,S))
 
-
+    tk.Label(root).pack
+    a = tk.Label(root, textvariable=buffer)
+    a.grid()
+    a.bind('<Key>', ImageCapture)
+    a.focus_set()
 
 
 

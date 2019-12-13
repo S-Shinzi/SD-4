@@ -11,7 +11,8 @@ def PasumoOCR(image_file):
 
 
     #まず、ここで読み取った画像を指定する
-    img = cv2.imread(image_file)
+    #img = cv2.imread(image_file)
+    img = image_file
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     lower = np.array([0, 0, 0])    #色の情報。ここから、↓
@@ -38,7 +39,7 @@ def PasumoOCR(image_file):
     # detect pink 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     lower = np.array([0, 0, 0])    #真っ黒
-    upper = np.array([150, 150, 250])#(現状)青の文字のみが読み取れる範囲指定
+    upper = np.array([150, 130, 200])#(現状)青の文字のみが読み取れる範囲指定
     img_mask = cv2.inRange(hsv, lower, upper)
     img_color = cv2.bitwise_and(img, img, mask=img_mask)
 
@@ -59,9 +60,9 @@ def PasumoOCR(image_file):
 
 
     #座標の指定は x, y, width, Height
-    box_area = np.array( [[9, 120, 400, 100],   #START
-                        [550, 120, 400, 100],  #END
-                        [120, 227, 650, 40],  #経由　　の文字がある座標を指定。 
+    box_area = np.array( [[10, 40, 190, 35],   #発駅
+                        [225, 40, 400, 35],  #着駅
+                        [35, 80, 300, 20],  #経由　　の文字がある座標を指定。 
                         ])  #これをすることで文字認識の精度がかなり上がる。
 
     pasmoList = [] # 結果を格納するリスト
