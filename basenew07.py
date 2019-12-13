@@ -13,6 +13,75 @@ import pyocr
 import pyocr.builders#pyocrを2列にする必要があるかはわからないが、精度が落ちると嫌なので一応書いておく
 import time
 import threading#カメラ関係、必須
+import MySQLdb
+
+def foon(event):
+    connection = MySQLdb.connect(
+            host = 'localhost',
+            user = 'root',
+            passwd = '',
+            db = 'table_test',
+            charset = 'utf8'
+            )
+    cursor = connection.cursor()
+
+    # 一覧の表示
+    cursor.execute("SELECT id, date, transfer_code, setsta_code, image, read_result, judge_result FROM kekka") 
+    #ーーーーー↑↑↑kekkaを消してテーブル名を記入↑↑↑ーーーー
+    
+    for row in cursor:
+        print(row)
+    
+
+    # ルートフレームの作成
+    root = tk.Tk()
+    # ツリービューの作成
+    tree = ttk.Treeview(root)
+
+    # 列インデックスの作成
+    tree["columns"] = (1,2,3,4,5,6,7)
+    # 表スタイルの設定(headingsはツリー形式ではない、通常の表形式)
+    tree["show"] = "headings"
+    # 各列の設定(インデックス,オプション(今回は幅を指定))
+    tree.column(1,width=75)
+    tree.column(2,width=75)
+    tree.column(3,width=90)
+    tree.column(4,width=90)
+    tree.column(5,width=90)
+    tree.column(6,width=90)
+    tree.column(7,width=90)
+    # 各列のヘッダー設定(インデックス,テキスト)
+    tree.heading(1,text="ID")
+    tree.heading(2,text="date")
+    tree.heading(3,text="transfer_code")
+    tree.heading(4,text="setsta_code")
+    tree.heading(5,text="image")
+    tree.heading(6,text="read_result")
+    tree.heading(7,text="judge_result")
+
+    X= 10
+    print(X)
+
+    # レコードの作成
+    # 1番目の引数-配置場所（ツリー形式にしない表設定ではブランクとする）
+    # 2番目の引数-end:表の配置順序を最下部に配置
+    #             (行インデックス番号を指定することもできる)
+    # 3番目の引数-values:レコードの値をタプルで指定する
+    for row in cursor:
+        tree.insert("","end",values=(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+
+    # ツリービューの配置
+    tree.pack()
+
+    root.mainloop()
+
+
+    # 保存を実行
+    connection.commit()
+    
+    # 接続を閉じる
+    connection.close()
+
 
 #！！！最初に読んで下さい！！！
 #現段階では、ウィンドウを消してもターミナルが消えず、カメラが起動したになってしまっています。
@@ -168,6 +237,7 @@ class App(object):
         scrollb = tki.Scrollbar(txt_frm, command=self.txt.yview)
         scrollb.grid(row=0, column=1, sticky='nsew')
         self.txt['yscrollcommand'] = scrollb.set
+
 
 
 def win2(event):
@@ -438,7 +508,7 @@ for i in range(1):                              #ボタンの数は１こ
     # ボタンの作成（コールバックコマンドには、コンボボックスの値を取得しprintする処理を定義）
     button3 = tk.Button(text="ターミナルに表示",command=lambda:print(combo.get()+"\n",combo2.get()))#\nで改行,それぞれのcomboの値を表示
     button4 = tk.Button(root,text="ウィンドウ生成")
-    button4.bind("<1>",win2) 
+    button4.bind("<1>",foon) 
     # ボタンの配置
     button3.grid(column=50, row=20)
     button3.place(x=700, y=300)
