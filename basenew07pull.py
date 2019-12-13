@@ -3,7 +3,10 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter as tki
 from tkinter import *
+from tkinter import messagebox
 from tkinter.font import Font
+import sys
+import threading#カメラ関係、必須
 
 #！！！最初に読んで下さい！！！
 #現段階では、ウィンドウを消してもターミナルが消えず、カメラが起動したになってしまっています。
@@ -21,6 +24,120 @@ root.geometry("1000x600+0+20")
 root.resizable(width=False, height=False)
 #root.protocol('WM_DELETE_WINDOW', doSomething)  #ここに、右上X関係の処理のヒントがあります
 
+
+lmain = tk.Label(root)
+lmain.grid()
+
+
+def on_closing():
+    ret = messagebox.askyesno('確認', 'ウィンドウを閉じますか？')
+    if ret == True:
+        sys.exit()
+    
+root.protocol("WM_DELETE_WINDOW", on_closing)
+
+def crozz(event):
+    sys.exit()
+
+
+
+
+def videoLoop(mirror=False):
+    No=0
+    cap = cv2.VideoCapture(No)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 10)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1)
+
+    while True:
+        ret, frame = cap.read()
+        if mirror is True:
+            frame = frame[:,::-1]
+
+        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(image)
+        image = ImageTk.PhotoImage(image)
+        panel = tk.Label(image=image, width=291, height=245)
+        panel.image = image
+        panel.place(x=325, y=35)
+
+    return panel
+
+
+
+
+def dow():
+
+    canvas01 = tk.Canvas(root, width=2800, height=2450)
+    canvas01.create_rectangle(0, 0, 2800, 2450, fill='gray')
+    canvas01.place(x=0, y=0)
+
+    canvas01b = tk.Canvas(root, width=290, height=255)
+    canvas01b.create_rectangle(0, 0, 949,333, fill='black')
+    canvas01b.place(x=10, y=30)
+    canvas01 = tk.Canvas(root, width=280, height=245)
+    canvas01.create_rectangle(0, 0, 0, 0, fill='white')
+    canvas01.place(x=15, y=35)
+
+
+    canvas02b = tk.Canvas(root, width=302, height=255)
+    canvas02b.create_rectangle(0, 0, 949,333, fill='black')
+    canvas02b.place(x=320, y=30)
+    canvas02 = tk.Canvas(root, width=292, height=245)
+    canvas02.create_rectangle(0, 0, 0, 0, fill='white')
+    canvas02.place(x=325, y=35)
+
+
+
+
+    canvas03b = tk.Canvas(root, width=310, height=365)
+    canvas03b.create_rectangle(0, 0, 310,365, fill='black')
+    canvas03b.place(x=645, y=30)
+    canvas03 = tk.Canvas(root, width=300, height=355)
+    canvas03.create_rectangle(0, 0, 0, 0, fill='gray')
+    canvas03.place(x=650, y=35)
+
+    canvas02b = tk.Canvas(root, width=611, height=100)
+    canvas02b.create_rectangle(0, 0, 949,333, fill='black')
+    canvas02b.place(x=10, y=295)
+    canvas02 = tk.Canvas(root, width=601, height=90)
+    canvas02.create_rectangle(0, 0, 0, 0, fill='gray')
+    canvas02.place(x=15, y=300)
+
+    canvas05b = tk.Canvas(root, width=948, height=170)
+    canvas05b.create_rectangle(0, 0, 949,199, fill='black')
+    canvas05b.place(x=10, y=420)
+    canvas02 = tk.Canvas(root, width=938, height=160)
+    canvas02.create_rectangle(0, 0, 0, 0, fill='gray')
+    canvas02.place(x=15, y=425)
+
+    labela = tk.Label(root,text="振り替え情報")        #tk(乱数)をセット
+    labela.place(x = 700,y = 80)  # rowspan=1 行感覚                            #tkを持ったlabelをウィンドウに表示
+
+    labelb = tk.Label(root,text="設置駅")        #tk(乱数)をセット
+    #labelb.grid(column=50, row=3,pady=10)                  #tkを持ったlabelをウィンドウに表示
+    labelb.place(x = 700,y = 200)
+
+    labelt = tk.Label(root,text="設定")        #tk(乱数)をセット                              #tkを持ったlabelをウィンドウに表示
+    labelt.place(x = 700,y = 50)
+    #label1 = tk.Label(root,text="label1 テキストが入れられます")        #tk(乱数)をセット
+    #label1.grid()                                #tkを持ったlabelをウィンドウに表示
+    #label1.place(x=602, y=80)
+
+dow()
+
+listn = ["AA","BB","CC"]
+print(listn)
+
+def delsan(event):
+    del listn[0:3]
+    print(listn)
+    arai(event)
+
+def popup(event):
+    print("簡易メッセージ、エラーが出ました") 
+    txt3.insert('1.0', "簡易メッセージ、エラーが出ました"+'\n')  
+    messagebox.showerror("エラー", "ここにエラーメッセージを記入")
+    #txt2.showinfo(title="Greetings", message="エラー!") 
 
 class App(object):
 
@@ -52,8 +169,12 @@ def win2(event):
     app.root.mainloop()
 
 
-
 for i in range(1):                              #ボタンの数は１こ
+              #winサイズと位置設定
+
+    button2 = tk.Button(root,text="エラーテスト")
+    button2.bind("<1>",popup)
+    button2.place(x=10, y=400)   
 
 
     combo = ttk.Combobox(root, state='readonly')
@@ -202,10 +323,81 @@ for i in range(1):                              #ボタンの数は１こ
 
 #width=935, height=150)
 
+    root.title('Editor Test')
+
+    text_widget = tk.Text(root, width=86, height=7)
+    text_widget.grid()
+    text_widget.place(x=15, y=300)
+    #text_widget.pack(column=30, row=10, sticky=(tk.N, tk.S, tk.E, tk.W))
+
+
+    # Frame
+    frame1 = ttk.Frame(root, padding=3)
+    frame1.rowconfigure(1, weight=1)
+    frame1.columnconfigure(0, weight=1)
+    frame1.grid()
+    frame1.place(x=15, y=300)
+    
+
+    # Text
+    f = Font(family='Helvetica', size=11)
+    v1 = StringVar()
+    txt2 = Text(frame1, width=72, height=5)
+    txt2.configure(font=f)
+    txt2.insert(1.0, "読み取り結果表示")
+    txt2.grid(row=1, column=0)
+    
+
+    scrollbar = ttk.Scrollbar(
+        frame1, 
+        orient=VERTICAL, 
+        command=txt2.yview)
+    txt2['yscrollcommand'] = scrollbar.set
+    scrollbar.grid(row=1,column=1,sticky=(N,S))
+    
+
+
+
 
     #text_widget.pack(column=30, row=10, sticky=(tk.N, tk.S, tk.E, tk.W))
 
 
+    # Frame
+    frame2 = ttk.Frame(root, padding=3)
+    frame2.rowconfigure(1, weight=1)
+    frame2.columnconfigure(0, weight=1)
+    frame2.grid()
+    frame2.place(x=16, y=426)
+    
+
+    # Text
+    f2 = Font(family='Helvetica', size=11)
+    v1 = StringVar()
+    txt3 = Text(frame2, width=114, height=9)
+    txt3.configure(font=f2)
+    txt3.insert(1.0, "エラー原因表示")
+    txt3.grid(row=1, column=0)
+    
+
+    scrollbar = ttk.Scrollbar(
+        frame2, 
+        orient=VERTICAL, 
+        command=txt3.yview)
+    txt3['yscrollcommand'] = scrollbar.set
+    scrollbar.grid(row=1,column=1,sticky=(N,S))
+
+
+
+
+
+    #text_widgetD = tk.Text(root,width=42, height=19)
+    #text_widgetD.place(x=324, y=34)
+    #text_widget.pack(column=30, row=10, sticky=(tk.N, tk.S, tk.E, tk.W))
+
+
+
+    thread = threading.Thread(target=videoLoop, args=())
+    thread.start()
 
 
 
