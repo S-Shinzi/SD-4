@@ -110,9 +110,9 @@ def Transport_judge(Route_judge, Sta_judge):
     Transport_judge = Route_judge and Sta_judge
 
     if Transport_judge:
-        print ("通過可")
+        return("通過可")
     else:
-        print("通過不可")
+        return("通過不可")
 
 
 

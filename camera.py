@@ -1,6 +1,6 @@
 def Capture(device_num, delay=1, window_name='frame'):
     import cv2
-    #import os
+    
 
 
     cap = cv2.VideoCapture(device_num)
@@ -34,16 +34,15 @@ def Capture(device_num, delay=1, window_name='frame'):
         # 補助線を引く
         cv2.rectangle(edframe, (120,116), (524,360),(0,0,255),3)
         # 表示
-        cv2.imshow(window_name, edframe)
+        cv2.imshow('windowName', edframe)
 
     cv2.destroyWindow(window_name)
-
 
 def judge(image_file):
     import OK_pasmo2
     import StationName_conv
     import judge
-
+    import basenew07pull
 
     # 設置駅
     Set_Sta = ('OE', 9) #湘南台
